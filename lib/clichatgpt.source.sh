@@ -10,7 +10,7 @@ __CLICHATGPT_SOURCED=1
 # --- Config ---------------------------------------------------------------
 
 # Configurable parameters (can be overridden via environment)
-: "${CLICHATGPT_URL:='https://chatgpt.com/?temporary-chat=true'}"
+: "${CLICHATGPT_URL:=https://chatgpt.com/?temporary-chat=true}"
 
 # Configurable parameters (can be overridden via environment)
 : "${CLICHATGPT_CHROME_CHATGPT_WAIT_REPLY_TIMEOUT:=10}"
