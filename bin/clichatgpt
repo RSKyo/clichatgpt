@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# 禁用 history expansion（避免 ! 被 bash 解释）
+set +o histexpand
+
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
+PROJECT_DIR="$(cd -- "$SCRIPT_DIR/.." &>/dev/null && pwd)"
+
+source "$PROJECT_DIR/lib/app.deps.source.sh"
+source "$PROJECT_DIR/lib/macos_gui.source.sh"
+source "$PROJECT_DIR/lib/clichatgpt.source.sh"
+
+main() {
+  clichatgpt_talk
+}
+
+main "$@"
