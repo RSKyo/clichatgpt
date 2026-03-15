@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Source-only library: app.deps
+# Source-only library: deps
 
 # --- Source Guard ------------------------------------------------------------
 

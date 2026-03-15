@@ -7,9 +7,10 @@
 [[ -n "${__CLICHATGPT_SOURCED+x}" ]] && return 0
 __CLICHATGPT_SOURCED=1
 
-# --- Constants ---------------------------------------------------------------
+# --- Config ---------------------------------------------------------------
 
-readonly CLICHATGPT_URL='https://chatgpt.com/?temporary-chat=true'
+# Configurable parameters (can be overridden via environment)
+: "${CLICHATGPT_URL:='https://chatgpt.com/?temporary-chat=true'}"
 
 # Configurable parameters (can be overridden via environment)
 : "${CLICHATGPT_CHROME_CHATGPT_WAIT_REPLY_TIMEOUT:=10}"

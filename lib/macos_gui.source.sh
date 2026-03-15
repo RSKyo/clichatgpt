@@ -7,7 +7,7 @@
 [[ -n "${__MACOS_GUI_SOURCED+x}" ]] && return 0
 __MACOS_GUI_SOURCED=1
 
-# --- Constants ---------------------------------------------------------------
+# --- Config ---------------------------------------------------------------
 
 # Configurable parameters (can be overridden via environment)
 : "${CLICHATGPT_CHROME_TABS_WAIT_STABLE_TIMEOUT:=5}"
@@ -15,6 +15,8 @@ __MACOS_GUI_SOURCED=1
 : "${CLICHATGPT_CHROME_TABS_WAIT_STABLE_THRESHOLD:=3}"
 : "${CLICHATGPT_CHROME_TAB_WAIT_LOAD_TIMEOUT:=10}"
 : "${CLICHATGPT_CHROME_TAB_WAIT_LOAD_SLEEP:=0.1}"
+
+# --- Public API --------------------------------------------------------------
 
 screen_workarea() {
   osascript -l JavaScript <<'EOF'

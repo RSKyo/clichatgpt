@@ -6,10 +6,14 @@ set +o histexpand
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 PROJECT_DIR="$(cd -- "$SCRIPT_DIR/.." &>/dev/null && pwd)"
+LIB_DIR="$PROJECT_DIR/lib"
+INFRA_DIR="$PROJECT_DIR/lib/infra"
 
-source "$PROJECT_DIR/lib/app.deps.source.sh"
-source "$PROJECT_DIR/lib/macos_gui.source.sh"
-source "$PROJECT_DIR/lib/clichatgpt.source.sh"
+source "$INFRA_DIR/log.source.sh"
+source "$INFRA_DIR/deps.source.sh"
+
+source "$LIB_DIR/macos_gui.source.sh"
+source "$LIB_DIR/clichatgpt.source.sh"
 
 main() {
   clichatgpt_talk
