@@ -5,10 +5,19 @@ set -euo pipefail
 # Config
 # -------------------------------------------------------------------
 
-REPO="zzz/clichatgpt"
+REPO="RSKyo/clichatgpt"
 BIN_NAME="clichatgpt"
 INSTALL_DIR="/usr/local/bin"
 URL="https://raw.githubusercontent.com/${REPO}/main/dist/${BIN_NAME}"
+
+# -------------------------------------------------------------------
+# Check platform
+# -------------------------------------------------------------------
+
+if [[ "$(uname)" != "Darwin" ]]; then
+  echo "error: ${BIN_NAME} currently supports macOS only" >&2
+  exit 1
+fi
 
 # -------------------------------------------------------------------
 # Check dependencies
@@ -35,17 +44,20 @@ echo "Installing ${BIN_NAME}..."
 # -------------------------------------------------------------------
 
 echo "Downloading binary..."
-curl -fsSL "$URL" -o "$TMP_FILE"
+
+if ! curl -fsSL "$URL" -o "$TMP_FILE"; then
+  echo "error: failed to download ${BIN_NAME}" >&2
+  exit 1
+fi
 
 # -------------------------------------------------------------------
 # Install
 # -------------------------------------------------------------------
 
-chmod +x "$TMP_FILE"
-
 echo "Installing to ${INSTALL_DIR}..."
 
 sudo mv "$TMP_FILE" "${INSTALL_DIR}/${BIN_NAME}"
+sudo chmod +x "${INSTALL_DIR}/${BIN_NAME}"
 
 # -------------------------------------------------------------------
 # Done
@@ -54,3 +66,7 @@ sudo mv "$TMP_FILE" "${INSTALL_DIR}/${BIN_NAME}"
 echo
 echo "✔ Installed ${BIN_NAME}"
 echo
+
+if ! echo "$PATH" | grep -q "$INSTALL_DIR"; then
+  echo "warning: ${INSTALL_DIR} is not in PATH"
+fi
