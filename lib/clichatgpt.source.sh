@@ -55,41 +55,68 @@ clichatgpt_talk() {
   # 激活 chrome
   app_activate "Google Chrome"
   
+    # 保存快照
+  clichatgpt_snapshot
 
-  local old_p old_pbpaste
-  old_p="$(cliclick p)"
-  old_pbpaste="$(pbpaste)"
-  printf '' | pbcopy
+  # 复制
+  clichatgpt_copy || {
+    loge "failed to copy reply"
+    return 1
+  }
 
-  # 计算 copy button 位置
-  local copy_button_xy
-  copy_button_xy="$(chrome_chatgpt_locate_copy_button_screen)" || return 1
-  
-  # 点击 copy button
-  cliclick c:"$copy_button_xy"
-  sleep 0.2
+  # 获取回复
+  local reply
+  reply="$(clichatgpt_get_reply)"
 
-  cliclick m:"$old_p"
+  # 从快照中恢复
+  clichatgpt_restore
 
   app_activate "Terminal"
 
-  local result deadline=$((SECONDS+2))
+  if [[ -n "$reply" ]]; then
+    printf '%s\n' "$reply"
+    return 0
+  else
+    loge "copy failed: clipboard empty"
+    return 1
+  fi
+}
+
+clichatgpt_snapshot() {
+  __clichatgpt_state_pbpaste="$(pbpaste)"
+  __clichatgpt_state_p="$(cliclick p)"
+  pbcopy </dev/null
+}
+
+clichatgpt_restore() {
+  [[ -n "${__clichatgpt_state_pbpaste+x}" ]] || return 0
+  printf '%s' "$__clichatgpt_state_pbpaste" | pbcopy
+  cliclick m:"$__clichatgpt_state_p"
+}
+
+clichatgpt_copy() {
+  local copy_button_xy
+  copy_button_xy="$(chrome_chatgpt_locate_copy_button_screen)" || return 1
+
+  cliclick c:"$copy_button_xy"
+  sleep 0.2
+}
+
+clichatgpt_get_reply() {
+  local reply deadline=$((SECONDS+2))
+
   while ((SECONDS < deadline)); do
-    result="$(pbpaste)"
-    [[ -n "$result" ]] && break
+    reply="$(pbpaste)"
+    if [[ -n "$reply" ]]; then
+      printf '%s' "$reply"
+      return 0
+    fi
     sleep 0.05
   done
 
-  printf "$old_pbpaste" | pbcopy
-
-  if [[ -n "$result" ]]; then
-    printf '%s\n' "$result"
-    return 0
-  fi
-
-  loge "copy failed: clipboard empty (xy=$copy_button_xy)"
   return 1
 }
+  
 
 chrome_chatgpt_input() {
   local text="$1"
@@ -106,9 +133,6 @@ chrome_chatgpt_input() {
 
   text="$(js_escape "$text")"
 
-  local encoded
-
-  encoded="$(printf '%s' "$text" | base64)"
 
   osascript <<EOF >/dev/null
 tell application "Google Chrome"
