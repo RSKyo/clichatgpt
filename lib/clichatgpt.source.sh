@@ -20,6 +20,7 @@ __CLICHATGPT_SOURCED=1
 
 clichatgpt_talk() {
   chrome_tab_open "$CLICHATGPT_URL" || return 1
+  sleep 0.1
   app_activate "Terminal"
 
   local text
