@@ -15,8 +15,6 @@ source "$INFRA_DIR/deps.source.sh"
 source "$LIB_DIR/macos_gui.source.sh"
 source "$LIB_DIR/clichatgpt.source.sh"
 
-main() {
-  clichatgpt_talk
-}
+require_cmds jq cliclick pbcopy pbpaste
 
-main "$@"
+clichatgpt_talk "$@"
