@@ -15,7 +15,20 @@ __fmt() {
 }
 
 __osascript() {
-  osascript
+  local out err code
+
+  err="$(mktemp)"
+  out="$(osascript "$@" 2>"$err")"
+  code=$?
+
+  if (( code != 0 )); then
+    loge "osascript failed: $(<"$err")"
+    rm -f "$err"
+    return $code
+  fi
+
+  rm -f "$err"
+  printf '%s\n' "$out"
 }
 
 # --- Screen Script Templates -------------------------------------------------
@@ -67,24 +80,22 @@ end tell'
 readonly __SCRIPT_WIN_FOCUS=\
 'tell application "System Events"
   tell process "%s"
-    if (count of windows) is 0 then return
+    if (count of windows) is 0 then error "no window"
     set frontmost to true
   end tell
 end tell'
 
-# args: $1=app
 readonly __SCRIPT_WIN_UNMINIMIZE=\
 'tell application "System Events"
   tell process "%s"
-    try
-      if (count of windows) > 0 then
-        tell window 1
-          if value of attribute "AXMinimized" then
-            set value of attribute "AXMinimized" to false
-          end if
-        end tell
-      end if
-    end try
+    if (count of windows) is 0 then error "no window"
+    tell window 1
+      try
+        if value of attribute "AXMinimized" then
+          set value of attribute "AXMinimized" to false
+        end if
+      end try
+    end tell
   end tell
 end tell'
 
@@ -92,7 +103,7 @@ end tell'
 readonly __SCRIPT_WIN_RESIZE=\
 'tell application "System Events"
   tell process "%s"
-    if (count of windows) is 0 then return
+    if (count of windows) is 0 then error "no window"
     set size of front window to {%s, %s}
   end tell
 end tell'
@@ -101,7 +112,7 @@ end tell'
 readonly __SCRIPT_WIN_MOVE=\
 'tell application "System Events"
   tell process "%s"
-    if (count of windows) is 0 then return
+    if (count of windows) is 0 then error "no window"
     set position of front window to {%s, %s}
   end tell
 end tell'
@@ -125,7 +136,7 @@ end tell'
 readonly __SCRIPT_WIN_FRAME_SET=\
 'tell application "System Events"
   tell process "%s"
-    if (count of windows) = 0 then return
+    if (count of windows) is 0 then error "no window"
     set position of front window to {%s, %s}
     set size of front window to {%s, %s}
   end tell

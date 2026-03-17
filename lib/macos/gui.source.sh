@@ -7,15 +7,6 @@
 [[ -n "${__MACOS_GUI_SOURCED+x}" ]] && return 0
 __MACOS_GUI_SOURCED=1
 
-
-
-# --- Internal Helpers --------------------------------------------------------
-
-__fmt() {
-  # shellcheck disable=SC2059
-  printf "$1\n" "${@:2}"
-}
-
 # --- Screen Script API -------------------------------------------------------
 
 screen_workarea() {
@@ -40,6 +31,12 @@ app_is_running() {
 }
 
 app_activate() {
+  local app="${1:?app_activate: missing app name}"
+
+  __fmt "$__SCRIPT_APP_ACTIVATE" "$app" | __osascript
+}
+
+app_raise() {
   local app="${1:?app_activate: missing app name}"
 
   {
