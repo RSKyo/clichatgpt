@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Source-only library: macos_gui
+# Source-only library: macos/chrome
 
 # --- Source Guard ------------------------------------------------------------
 
 # Prevent multiple sourcing
-[[ -n "${__MACOS_GUI_SOURCED+x}" ]] && return 0
-__MACOS_GUI_SOURCED=1
+[[ -n "${__MACOS_CHROME_SOURCED+x}" ]] && return 0
+__MACOS_CHROME_SOURCED=1
 
 # --- Config ---------------------------------------------------------------
 
@@ -16,11 +16,7 @@ __MACOS_GUI_SOURCED=1
 : "${CLICHATGPT_CHROME_TAB_LOAD_TIMEOUT:=10}"
 : "${CLICHATGPT_CHROME_TAB_LOAD_POLL_INTERVAL:=0.1}"
 
-
-
-###############################################################################
-# Google Chrome
-###############################################################################
+# --- Public API --------------------------------------------------------------
 
 chrome_tabs_count() {
   osascript <<EOF

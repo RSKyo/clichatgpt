@@ -15,6 +15,8 @@ __CLICHATGPT_SOURCED=1
 # Configurable parameters (can be overridden via environment)
 : "${CLICHATGPT_CHROME_CHATGPT_WAIT_REPLY_COMPLETE_TIMEOUT:=60}"
 : "${CLICHATGPT_CHROME_CHATGPT_WAIT_REPLY_COMPLETE_SLEEP:=0.5}"
+: "${CLICHATGPT_REPLY_DIR:="${HOME}/.local/share/clichatgpt"}"
+: "${CLICHATGPT_REPLY_FILE_NAME:="$(date '+%Y%m%d_%H%M%S')_reply"}"
 
 # --- Public API --------------------------------------------------------------
 
@@ -115,6 +117,41 @@ clichatgpt_get_reply() {
   done
 
   return 1
+}
+
+clichatgpt_reply_filename() {
+  local input="${1:-}"
+  local prefix text
+
+  # 1️⃣ 取前 20 个字符（UTF-8 安全）
+  text="$(printf '%s' "$input" | cut -c1-20)"
+
+  # 2️⃣ 去换行
+  text="${text//$'\n'/ }"
+
+  # 3️⃣ 替换非法文件名字符
+  # macOS / Linux 常见非法字符
+  text="${text//\//_}"
+  text="${text//:/_}"
+  text="${text//\*/_}"
+  text="${text//\?/_}"
+  text="${text//\"/_}"
+  text="${text//</_}"
+  text="${text//>/_}"
+  text="${text//|/_}"
+
+  # 4️⃣ 压缩多余空格
+  text="$(printf '%s' "$text" | tr -s ' ')"
+
+  # 5️⃣ 去首尾空格
+  text="${text#"${text%%[! ]*}"}"
+  text="${text%"${text##*[! ]}"}"
+
+  # 6️⃣ 防止为空
+  [[ -z "$text" ]] && text="reply"
+
+  # 7️⃣ 组合
+  printf '%s_%s\n' "$(date '+%Y%m%d_%H%M%S')" "$text"
 }
   
 
