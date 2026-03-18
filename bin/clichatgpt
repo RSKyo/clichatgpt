@@ -6,13 +6,14 @@ set +o histexpand
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 PROJECT_DIR="$(cd -- "$SCRIPT_DIR/.." &>/dev/null && pwd)"
-LIB_DIR="$PROJECT_DIR/lib"
 INFRA_DIR="$PROJECT_DIR/lib/infra"
+LIB_DIR="$PROJECT_DIR/lib"
 
 source "$INFRA_DIR/log.source.sh"
 source "$INFRA_DIR/deps.source.sh"
 source "$INFRA_DIR/config.source.sh"
 
+source "$LIB_DIR/node.source.sh"
 source "$LIB_DIR/macos_gui.source.sh"
 source "$LIB_DIR/clichatgpt.source.sh"
 
@@ -21,4 +22,39 @@ clichatgpt_config_load
 
 require_cmds jq cliclick pbcopy pbpaste
 
-clichatgpt_talk "$@"
+clichatgpt_usage() {
+  cat <<'EOF'
+Usage:
+  clichatgpt talk [args...]
+  clichatgpt cdp  [args...]
+
+Commands:
+  talk    Talk to ChatGPT
+  cdp     Run CDP helper commands
+EOF
+}
+
+main() {
+  local cmd="${1:-talk}"
+
+  case "$cmd" in
+    talk)
+      shift || true
+      clichatgpt_talk "$@"
+      ;;
+    cdp)
+      shift || true
+      node_cdp "$@"
+      ;;
+    -h|--help|help)
+      clichatgpt_usage
+      ;;
+    *)
+      loge "unknown command: $cmd"
+      clichatgpt_usage
+      return 2
+      ;;
+  esac
+}
+
+main "$@"

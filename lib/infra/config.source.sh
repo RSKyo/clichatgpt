@@ -15,7 +15,7 @@ clichatgpt_config_ensure() {
 CLICHATGPT_URL='https://chatgpt.com/?temporary-chat=true'
 
 CLICHATGPT_REPLY_DIR="${HOME}/.local/share/clichatgpt"
-CLICHATGPT_REPLY_FILE_NAME:="$(date '+%Y%m%d_%H%M%S')_reply"
+CLICHATGPT_REPLY_FILE_NAME="$(date '+%Y%m%d_%H%M%S')_reply"
 EOF
 }
 
