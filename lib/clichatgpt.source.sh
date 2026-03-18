@@ -21,67 +21,75 @@ __CLICHATGPT_SOURCED=1
 # --- Public API --------------------------------------------------------------
 
 clichatgpt_talk() {
-  chrome_tab_open "$CLICHATGPT_URL" || return 1
-  sleep 0.1
-  app_activate "Terminal"
 
-  local text
+  local tabId
+  tabId="$(cdp_find_tab_id 'chatgpt.com')"
 
-  if [[ $# -gt 0 ]]; then
-    text="$*"
-  else
-    text="$(cat)"
-  fi
+  local input
+  input="$(cdp_text "$tabId" '[contenteditable]')"
+  log clichatgpt "$input"
 
-  # 输入
-  chrome_chatgpt_input "$text" || {
-    loge "failed to input prompt"
-    return 1
-  }
+  # chrome_tab_open "$CLICHATGPT_URL" || return 1
+  # sleep 0.1
+  # app_activate "Terminal"
 
-  # 提交
-  chrome_chatgpt_submit || {
-    loge "failed to submit message"
-    return 1
-  }
-  sleep 1
+  # local text
 
-  # 等待回复
-  chrome_chatgpt_wait_reply_complete || {
-    loge "chatgpt reply timeout (${CLICHATGPT_CHROME_CHATGPT_WAIT_REPLY_COMPLETE_TIMEOUT}s)"
-    return 1
-  }
-  # 将 copy button 滚动到顶部
-  chrome_chatgpt_scroll_copy_button
+  # if [[ $# -gt 0 ]]; then
+  #   text="$*"
+  # else
+  #   text="$(cat)"
+  # fi
 
-  # 激活 chrome
-  app_activate "Google Chrome"
+  # # 输入
+  # chrome_chatgpt_input "$text" || {
+  #   loge "failed to input prompt"
+  #   return 1
+  # }
+
+  # # 提交
+  # chrome_chatgpt_submit || {
+  #   loge "failed to submit message"
+  #   return 1
+  # }
+  # sleep 1
+
+  # # 等待回复
+  # chrome_chatgpt_wait_reply_complete || {
+  #   loge "chatgpt reply timeout (${CLICHATGPT_CHROME_CHATGPT_WAIT_REPLY_COMPLETE_TIMEOUT}s)"
+  #   return 1
+  # }
+  # # 将 copy button 滚动到顶部
+  # chrome_chatgpt_scroll_copy_button
+
+  # # 激活 chrome
+  # app_activate "Google Chrome"
   
-    # 保存快照
-  clichatgpt_snapshot
+  #   # 保存快照
+  # clichatgpt_snapshot
 
-  # 复制
-  clichatgpt_copy || {
-    loge "failed to copy reply"
-    return 1
-  }
+  # # 复制
+  # clichatgpt_copy || {
+  #   loge "failed to copy reply"
+  #   return 1
+  # }
 
-  # 获取回复
-  local reply
-  reply="$(clichatgpt_get_reply)"
+  # # 获取回复
+  # local reply
+  # reply="$(clichatgpt_get_reply)"
 
-  # 从快照中恢复
-  clichatgpt_restore
+  # # 从快照中恢复
+  # clichatgpt_restore
 
-  app_activate "Terminal"
+  # app_activate "Terminal"
 
-  if [[ -n "$reply" ]]; then
-    printf '%s\n' "$reply"
-    return 0
-  else
-    loge "copy failed: clipboard empty"
-    return 1
-  fi
+  # if [[ -n "$reply" ]]; then
+  #   printf '%s\n' "$reply"
+  #   return 0
+  # else
+  #   loge "copy failed: clipboard empty"
+  #   return 1
+  # fi
 }
 
 clichatgpt_snapshot() {

@@ -58,3 +58,11 @@ main() {
 }
 
 main "$@"
+
+
+# open -na "Google Chrome" "https://chatgpt.com/?temporary-chat=true" --args \
+# --remote-debugging-port=9222 \
+# --user-data-dir="$HOME/.local/share/clichatgpt/chrome-cdp-profile"
+
+# 验证是否成功启动 CDP
+# curl http://127.0.0.1:9222/json/version
