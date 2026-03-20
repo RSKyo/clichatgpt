@@ -24,7 +24,7 @@ __CHATGPT_SOURCED=1
 
 chatgpt_talk() {
 
-  chrome_debug_ensure || return 1
+  # chrome_debug_ensure || return 1
 
   log "xxxxx"
   # local tab_id

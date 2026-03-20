@@ -1,7 +1,6 @@
 import CDP from 'chrome-remote-interface';
+import { HOST, PORT } from '../config'
 
-export const HOST = '127.0.0.1';
-export const PORT = 9222;
 
 async function newClient(tabId) {
   return CDP({ target: tabId, host: HOST, port: PORT });
@@ -99,13 +98,4 @@ export function respondError(err) {
     ok: false,
     error: err?.message || String(err) || 'unknown error',
   }));
-}
-
-export async function runCmd(fn) {
-  try {
-    await fn();
-  } catch (err) {
-    respondError(err)
-    process.exit(1);
-  }
 }

@@ -46,6 +46,14 @@ main() {
   local cmd="${1:--h}"
 
   case "$cmd" in
+    start)
+      shift || true
+      chrome_debug_ensure "$@"
+      ;;
+    stop)
+      shift || true
+      chrome_debug_quit "$@"
+      ;;
     cdp)
       shift || true
       cdp "$@"
