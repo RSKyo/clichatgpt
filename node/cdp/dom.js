@@ -3,11 +3,16 @@
 // ========================
 
 import { getClient } from './client.js';
+import { ERROR_CODE, CliError } from '../infra/protocol.js';
 
 /**
  * 获取文档根节点
  */
 export async function getDocument(targetId, options = {}) {
+  if (!targetId) {
+    throw new CliError(ERROR_CODE.INVALID_ARGS, 'missing targetId');
+  }
+
   const client = await getClient(targetId);
   const { DOM } = client;
 
@@ -23,8 +28,17 @@ export async function getDocument(targetId, options = {}) {
  * 在指定节点下查找单个元素
  */
 export async function querySelector(targetId, nodeId, selector) {
-  if (!nodeId) throw new Error('missing nodeId');
-  if (!selector) throw new Error('missing selector');
+  if (!targetId) {
+    throw new CliError(ERROR_CODE.INVALID_ARGS, 'missing targetId');
+  }
+
+  if (!nodeId) {
+    throw new CliError(ERROR_CODE.INVALID_ARGS, 'missing nodeId');
+  }
+
+  if (!selector) {
+    throw new CliError(ERROR_CODE.INVALID_ARGS, 'missing selector');
+  }
 
   const client = await getClient(targetId);
   const { DOM } = client;
@@ -41,8 +55,17 @@ export async function querySelector(targetId, nodeId, selector) {
  * 在指定节点下查找多个元素
  */
 export async function querySelectorAll(targetId, nodeId, selector) {
-  if (!nodeId) throw new Error('missing nodeId');
-  if (!selector) throw new Error('missing selector');
+  if (!targetId) {
+    throw new CliError(ERROR_CODE.INVALID_ARGS, 'missing targetId');
+  }
+
+  if (!nodeId) {
+    throw new CliError(ERROR_CODE.INVALID_ARGS, 'missing nodeId');
+  }
+
+  if (!selector) {
+    throw new CliError(ERROR_CODE.INVALID_ARGS, 'missing selector');
+  }
 
   const client = await getClient(targetId);
   const { DOM } = client;
@@ -59,7 +82,13 @@ export async function querySelectorAll(targetId, nodeId, selector) {
  * 从文档根节点开始查找单个元素
  */
 export async function queryDocumentSelector(targetId, selector) {
-  if (!selector) throw new Error('missing selector');
+  if (!targetId) {
+    throw new CliError(ERROR_CODE.INVALID_ARGS, 'missing targetId');
+  }
+
+  if (!selector) {
+    throw new CliError(ERROR_CODE.INVALID_ARGS, 'missing selector');
+  }
 
   const root = await getDocument(targetId);
   return await querySelector(targetId, root.nodeId, selector);
@@ -69,7 +98,13 @@ export async function queryDocumentSelector(targetId, selector) {
  * 从文档根节点开始查找多个元素
  */
 export async function queryDocumentSelectorAll(targetId, selector) {
-  if (!selector) throw new Error('missing selector');
+  if (!targetId) {
+    throw new CliError(ERROR_CODE.INVALID_ARGS, 'missing targetId');
+  }
+
+  if (!selector) {
+    throw new CliError(ERROR_CODE.INVALID_ARGS, 'missing selector');
+  }
 
   const root = await getDocument(targetId);
   return await querySelectorAll(targetId, root.nodeId, selector);
@@ -79,8 +114,9 @@ export async function queryDocumentSelectorAll(targetId, selector) {
  * 描述节点
  */
 export async function describeNode(targetId, options = {}) {
-  const client = await getClient(targetId);
-  const { DOM } = client;
+  if (!targetId) {
+    throw new CliError(ERROR_CODE.INVALID_ARGS, 'missing targetId');
+  }
 
   const payload = {};
 
@@ -91,8 +127,11 @@ export async function describeNode(targetId, options = {}) {
   if (options.pierce != null) payload.pierce = options.pierce;
 
   if (!payload.nodeId && !payload.backendNodeId && !payload.objectId) {
-    throw new Error('missing node reference');
+    throw new CliError(ERROR_CODE.INVALID_ARGS, 'missing node reference');
   }
+
+  const client = await getClient(targetId);
+  const { DOM } = client;
 
   const res = await DOM.describeNode(payload);
   return res.node;
@@ -103,7 +142,13 @@ export async function describeNode(targetId, options = {}) {
  * 返回扁平数组：[name1, value1, name2, value2, ...]
  */
 export async function getAttributes(targetId, nodeId) {
-  if (!nodeId) throw new Error('missing nodeId');
+  if (!targetId) {
+    throw new CliError(ERROR_CODE.INVALID_ARGS, 'missing targetId');
+  }
+
+  if (!nodeId) {
+    throw new CliError(ERROR_CODE.INVALID_ARGS, 'missing nodeId');
+  }
 
   const client = await getClient(targetId);
   const { DOM } = client;
@@ -131,8 +176,9 @@ export function attributesToObject(attributes = []) {
  * 获取 outerHTML
  */
 export async function getOuterHTML(targetId, options = {}) {
-  const client = await getClient(targetId);
-  const { DOM } = client;
+  if (!targetId) {
+    throw new CliError(ERROR_CODE.INVALID_ARGS, 'missing targetId');
+  }
 
   const payload = {};
 
@@ -141,8 +187,11 @@ export async function getOuterHTML(targetId, options = {}) {
   if (options.objectId) payload.objectId = options.objectId;
 
   if (!payload.nodeId && !payload.backendNodeId && !payload.objectId) {
-    throw new Error('missing node reference');
+    throw new CliError(ERROR_CODE.INVALID_ARGS, 'missing node reference');
   }
+
+  const client = await getClient(targetId);
+  const { DOM } = client;
 
   const res = await DOM.getOuterHTML(payload);
   return res.outerHTML ?? '';
@@ -152,8 +201,9 @@ export async function getOuterHTML(targetId, options = {}) {
  * 获取 box model
  */
 export async function getBoxModel(targetId, options = {}) {
-  const client = await getClient(targetId);
-  const { DOM } = client;
+  if (!targetId) {
+    throw new CliError(ERROR_CODE.INVALID_ARGS, 'missing targetId');
+  }
 
   const payload = {};
 
@@ -162,8 +212,11 @@ export async function getBoxModel(targetId, options = {}) {
   if (options.objectId) payload.objectId = options.objectId;
 
   if (!payload.nodeId && !payload.backendNodeId && !payload.objectId) {
-    throw new Error('missing node reference');
+    throw new CliError(ERROR_CODE.INVALID_ARGS, 'missing node reference');
   }
+
+  const client = await getClient(targetId);
+  const { DOM } = client;
 
   const res = await DOM.getBoxModel(payload);
   return res.model ?? null;
@@ -171,10 +224,15 @@ export async function getBoxModel(targetId, options = {}) {
 
 /**
  * 将 nodeId 解析为 objectId
- * 这样可以配合 Runtime.callFunctionOn / Runtime.getProperties 使用
  */
 export async function resolveNode(targetId, nodeId) {
-  if (!nodeId) throw new Error('missing nodeId');
+  if (!targetId) {
+    throw new CliError(ERROR_CODE.INVALID_ARGS, 'missing targetId');
+  }
+
+  if (!nodeId) {
+    throw new CliError(ERROR_CODE.INVALID_ARGS, 'missing nodeId');
+  }
 
   const client = await getClient(targetId);
   const { DOM } = client;
@@ -184,10 +242,16 @@ export async function resolveNode(targetId, nodeId) {
 }
 
 /**
- * 将 objectId 解析为 node
+ * 将 objectId 解析为 nodeId
  */
 export async function requestNode(targetId, objectId) {
-  if (!objectId) throw new Error('missing objectId');
+  if (!targetId) {
+    throw new CliError(ERROR_CODE.INVALID_ARGS, 'missing targetId');
+  }
+
+  if (!objectId) {
+    throw new CliError(ERROR_CODE.INVALID_ARGS, 'missing objectId');
+  }
 
   const client = await getClient(targetId);
   const { DOM } = client;
@@ -200,7 +264,13 @@ export async function requestNode(targetId, objectId) {
  * 聚焦节点
  */
 export async function focusNode(targetId, nodeId) {
-  if (!nodeId) throw new Error('missing nodeId');
+  if (!targetId) {
+    throw new CliError(ERROR_CODE.INVALID_ARGS, 'missing targetId');
+  }
+
+  if (!nodeId) {
+    throw new CliError(ERROR_CODE.INVALID_ARGS, 'missing nodeId');
+  }
 
   const client = await getClient(targetId);
   const { DOM } = client;
@@ -209,13 +279,22 @@ export async function focusNode(targetId, nodeId) {
 }
 
 /**
- * 获取元素中心点坐标
- * 返回: { x, y }
+ * 获取元素中心点
+ * 返回：{ x, y }
  */
 export async function getNodeCenter(targetId, nodeId) {
+  if (!targetId) {
+    throw new CliError(ERROR_CODE.INVALID_ARGS, 'missing targetId');
+  }
+
+  if (!nodeId) {
+    throw new CliError(ERROR_CODE.INVALID_ARGS, 'missing nodeId');
+  }
+
   const model = await getBoxModel(targetId, { nodeId });
+
   if (!model || !Array.isArray(model.content) || model.content.length < 8) {
-    throw new Error('failed to get box model');
+    throw new CliError(ERROR_CODE.INTERNAL_ERROR, 'failed to get box model');
   }
 
   const quad = model.content;
