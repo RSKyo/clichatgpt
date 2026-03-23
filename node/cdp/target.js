@@ -1,6 +1,6 @@
 import CDP from 'chrome-remote-interface';
-import { HOST, PORT, TARGET_TYPES } from '../infra/env.js';
-import { ERROR_CODE, CliError } from '../infra/protocol.js';
+import { HOST, PORT } from '../infra/env.js';
+import { requireArg, requireValue } from './assert.js';
 
 function normalizeTarget(t) {
   return {
@@ -12,15 +12,7 @@ function normalizeTarget(t) {
   };
 }
 
-function shouldKeepTarget(t) {
-  if (!Array.isArray(TARGET_TYPES) || TARGET_TYPES.length === 0) {
-    return true;
-  }
-
-  return TARGET_TYPES.includes(t.type);
-}
-
-function isUsableTarget(target) {
+function isWebPageTarget(target) {
   if (!target) return false;
   if (target.type !== 'page') return false;
   if (!target.url) return false;
@@ -36,29 +28,32 @@ function isUsableTarget(target) {
  */
 export async function listTargets() {
   const targets = await CDP.List({ host: HOST, port: PORT });
+  return targets.map(normalizeTarget);
+}
+
+/**
+ * 获取所有网页 target
+ */
+export async function listWebPageTargets() {
+  const targets = await CDP.List({ host: HOST, port: PORT });
 
   return targets
-    .filter(shouldKeepTarget)
-    .filter(isUsableTarget)
+    .filter(isWebPageTarget)
     .map(normalizeTarget);
 }
 
 export async function hasTarget(targetId) {
-  if (!targetId) {
-    throw new CliError(ERROR_CODE.INVALID_ARGS, 'missing targetId');
-  }
+  requireArg(targetId, 'missing targetId');
 
   const targets = await listTargets();
   return targets.some(t => t.id === targetId);
 }
 
 /**
- * 创建 target
+ * 新建 target
  */
 export async function newTarget(url) {
-  if (!url) {
-    throw new CliError(ERROR_CODE.INVALID_ARGS, 'missing url');
-  }
+  requireArg(url, 'missing url');
 
   const target = await CDP.New({
     url,
@@ -70,12 +65,22 @@ export async function newTarget(url) {
 }
 
 /**
+ * 获取当前激活的 target
+ */
+export async function currentTarget() {
+  const targets = await listTargets();
+
+  const target = targets.find(t => t.attached);
+  requireValue(target, 'no active target');
+
+  return target;
+}
+
+/**
  * 激活 target
  */
 export async function activateTarget(targetId) {
-  if (!targetId) {
-    throw new CliError(ERROR_CODE.INVALID_ARGS, 'missing targetId');
-  }
+  requireArg(targetId, 'missing targetId');
 
   await CDP.Activate({
     id: targetId,
@@ -88,9 +93,7 @@ export async function activateTarget(targetId) {
  * 关闭 target
  */
 export async function closeTarget(targetId) {
-  if (!targetId) {
-    throw new CliError(ERROR_CODE.INVALID_ARGS, 'missing targetId');
-  }
+  requireArg(targetId, 'missing targetId');
 
   await CDP.Close({
     id: targetId,
@@ -103,36 +106,32 @@ export async function closeTarget(targetId) {
  * 查找 target
  */
 export async function findTarget(keyword) {
-  if (!keyword) {
-    throw new CliError(ERROR_CODE.INVALID_ARGS, 'missing keyword');
-  }
+  requireArg(keyword, 'missing keyword');
 
   const targets = await listTargets();
-
+  
   const target = targets.find(t =>
     (t.url && t.url.includes(keyword)) ||
     (t.title && t.title.includes(keyword))
   );
-
-  if (!target) {
-    throw new CliError(ERROR_CODE.NOT_FOUND, 'target not found');
-  }
+  requireValue(target, `no target found for keyword: ${keyword}`);
 
   return target;
 }
 
 /**
- * 获取当前激活 target
+ * 查找网页 target
  */
-export async function currentTarget() {
-  const targets = await listTargets();
+export async function findWebPageTarget(keyword) {
+  requireArg(keyword, 'missing keyword');
 
-  const target = targets.find(t => t.attached);
-
-  if (!target) {
-    throw new CliError(ERROR_CODE.NOT_FOUND, 'no active target');
-  }
-
+  const targets = await listWebPageTargets();
+  
+  const target = targets.find(t =>
+    (t.url && t.url.includes(keyword)) ||
+    (t.title && t.title.includes(keyword))
+  );
+  requireValue(target, `no web page target found for keyword: ${keyword}`);
+  
   return target;
 }
-

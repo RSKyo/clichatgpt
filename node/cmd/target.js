@@ -6,99 +6,52 @@ import { normalizeUrl } from '../infra/url.js';
 
 import {
   listTargets,
+  listWebPageTargets,
   hasTarget,
   newTarget,
+  currentTarget,
   activateTarget,
   closeTarget,
   findTarget,
-  currentTarget,
+  findWebPageTarget,
 } from '../cdp/target.js';
 
-// target 命令注册表
-// 负责“target 对象管理”这一层：
-// - 列出有哪些 target
-// - target 是否存在
-// - 新建 target
-// - 打开或复用已有 target
-// - 激活 target
-// - 关闭 target
-// - 查找 target
-// - 获取当前 target
 export const TARGET_COMMANDS = {
-  list: cmd_list,
-  has: cmd_has,
-  new: cmd_new,
-  open: cmd_open,
-  activate: cmd_activate,
-  close: cmd_close,
-  find: cmd_find,
-  current: cmd_current,
+  list: cmd_list,         // 列出所有 target
+  listweb: cmd_listweb,   // 列出网页 target
+  has: cmd_has,           // 判断 target 是否存在
+  new: cmd_new,           // 新建 target
+  open: cmd_open,         // 打开 url
+  current: cmd_current,   // 获取当前 target
+  activate: cmd_activate, // 激活 target
+  close: cmd_close,       // 关闭 target
+  find: cmd_find,         // 查找 target
+  findweb: cmd_findweb,   // 查找网页 target
 };
 
-/**
- * 列出所有 targets
- *
- * 用法：
- *   welm target list
- *
- * 返回：
- * - 当前浏览器中的 target 列表
- */
+// 列出所有 target
 async function cmd_list() {
   return await listTargets();
 }
 
-/**
- * 判断 target 是否存在
- *
- * 用法：
- *   welm target has <targetId>
- *
- * 示例：
- *   welm target has ABC123
- */
+// 列出网页 target
+async function cmd_listweb() {
+  return await listWebPageTargets();
+}
+
+// 判断 target 是否存在
 async function cmd_has(args) {
   const [targetId] = args;
   return await hasTarget(targetId);
 }
 
-/**
- * 新建一个 target
- *
- * 用法：
- *   welm target new [url]
- *
- * 说明：
- * - 不传 url 时，新建一个空白页
- * - 传 url 时，新建 target 并直接打开该地址
- *
- * 示例：
- *   welm target new
- *   welm target new https://example.com
- */
+// 新建 target
 async function cmd_new(args) {
   const [url] = args;
   return await newTarget(url);
 }
 
-/**
- * 打开指定 url
- *
- * 用法：
- *   welm target open <url>
- *
- * 说明：
- * - 先对输入 url 做标准化
- * - 如果当前已存在相同 url 的 target，则直接激活并返回该 targetId
- * - 如果不存在，则新建 target 并打开该 url
- *
- * 这个命令的语义是：
- * - 优先复用已有页面
- * - 没有才创建新页面
- *
- * 示例：
- *   welm target open https://example.com
- */
+// 打开 url，存在则激活，不存在则新建
 async function cmd_open(args) {
   const [url] = args;
 
@@ -115,64 +68,31 @@ async function cmd_open(args) {
   return await newTarget(url);
 }
 
-/**
- * 激活指定 target
- *
- * 用法：
- *   welm target activate <targetId>
- *
- * 说明：
- * - 将指定 target 切换到前台
- *
- * 示例：
- *   welm target activate ABC123
- */
+// 获取当前 target
+async function cmd_current() {
+  return await currentTarget();
+}
+
+// 激活 target
 async function cmd_activate(args) {
   const [targetId] = args;
   await activateTarget(targetId);
 }
 
-/**
- * 关闭指定 target
- *
- * 用法：
- *   welm target close <targetId>
- *
- * 示例：
- *   welm target close ABC123
- */
+// 关闭 target
 async function cmd_close(args) {
   const [targetId] = args;
   await closeTarget(targetId);
 }
 
-/**
- * 按关键字查找 target
- *
- * 用法：
- *   welm target find <keyword>
- *
- * 说明：
- * - 一般会在 title、url 等信息中查找匹配项
- *
- * 示例：
- *   welm target find chatgpt
- *   welm target find example.com
- */
+// 查找 target
 async function cmd_find(args) {
   const [keyword] = args;
   return await findTarget(keyword);
 }
 
-/**
- * 获取当前 target
- *
- * 用法：
- *   welm target current
- *
- * 返回：
- * - 当前激活的 target 信息
- */
-async function cmd_current() {
-  return await currentTarget();
+// 查找网页 target
+async function cmd_findweb(args) {
+  const [keyword] = args;
+  return await findWebPageTarget(keyword);
 }

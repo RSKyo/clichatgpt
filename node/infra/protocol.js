@@ -2,6 +2,8 @@
 export const ERROR_CODE = {
   MISSING_ARGS: 'MISSING_ARGS',
   INVALID_ARGS: 'INVALID_ARGS',
+  EMPTY_VALUE: 'EMPTY_VALUE',
+  EVALUATE_ERROR: 'evaluate_ERROR',
   MISSING_CMD: 'MISSING_CMD',
   INVALID_CMD: 'INVALID_CMD',
   INTERNAL_ERROR: 'INTERNAL_ERROR',
@@ -95,3 +97,4 @@ export async function run(main) {
     process.exitCode = 1;
   }
 }
+
