@@ -2,7 +2,7 @@
 // CLI target commands
 // ========================
 
-import { normalizeUrl } from '../infra/url.js';
+import { normalizeUrl } from '../infra/core.js';
 
 import {
   listTargets,

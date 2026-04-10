@@ -43,8 +43,11 @@ function getWaitOptions(timeout, interval) {
  *
  * 等 selector 出现。
  */
-export async function cmd_selector(args = []) {
-  const [targetId, selector, timeout, interval] = args;
+export async function cmd_selector(ctx) {
+  const { args, options } = ctx;
+  const [targetId, selector] = args;
+  const timeout = Number(options.timeout ?? 10000);
+  const interval = Number(options.interval ?? 200);
 
   if (!targetId) {
     throw new CliError(ERROR_CODE.INVALID_ARGS, 'missing targetId');
