@@ -1,4 +1,4 @@
-import { ERROR_CODE, ClientError } from './protocol.js';
+import { ERROR_CODE, ClientError } from './error.js';
 
 export function normalizeUrl(url) {
   try {
@@ -24,30 +24,49 @@ export function toPositiveNumber(value, fallback) {
   return ensurePositiveNumber(n, fallback);
 }
 
+const TRUE_VALUES = new Set([true, 'true', '1']);
+const FALSE_VALUES = new Set([false, 'false', '0']);
 
-export function toBool(value, defaultValue = true) {
+export function toBool(value, field = 'boolean', defaultValue = true) {
   if (value == null || value === '') return defaultValue;
-    if (value === true || value === 'true' || value === '1') return true;
-    if (value === false || value === 'false' || value === '0') return false;
-  
-    throw new ClientError(ERROR_CODE.INVALID_ARGS, `invalid boolean: ${value}`);
+
+  if (TRUE_VALUES.has(value)) return true;
+  if (FALSE_VALUES.has(value)) return false;
+
+  throw new ClientError(
+    ERROR_CODE.ARG_INVALID,
+    `invalid ${field}`
+  );
 }
 
-export function toInt(value, name) {
+export function toNumber(value, field = 'number') {
+  if (value == null || value === '') {
+    throw new ClientError(
+      ERROR_CODE.ARG_INVALID,
+      `invalid ${field}`
+    );
+  }
+
   const n = Number(value);
 
   if (!Number.isFinite(n)) {
-    throw new ClientError(ERROR_CODE.INVALID_ARGS, `invalid ${name}`);
+    throw new ClientError(
+      ERROR_CODE.ARG_INVALID,
+      `invalid ${field}`
+    );
   }
 
   return n;
 }
 
-export function toFloat(value, name) {
-  const n = Number(value);
+export function toInt(value, field = 'integer') {
+  const n = toNumber(value, field);
 
-  if (!Number.isFinite(n)) {
-    throw new ClientError(ERROR_CODE.INVALID_ARGS, `invalid ${name}`);
+  if (!Number.isInteger(n)) {
+    throw new ClientError(
+      ERROR_CODE.ARG_INVALID,
+      `invalid ${field} (must be integer)`
+    );
   }
 
   return n;
