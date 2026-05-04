@@ -18,51 +18,9 @@ import { ensurePositiveNumber, sleep } from '../infra/core.js';
  * - 等导航、DOMContentLoaded、load
  */
 
-/**
- * 判断轮询结果是否命中。
- */
-function isPollMatched(value) {
-  if (typeof value === 'boolean') {
-    return value === true;
-  }
 
-  if (typeof value === 'string') {
-    return value !== '';
-  }
 
-  return false;
-}
 
-/**
- * 轮询执行表达式，直到命中或超时。
- */
-async function poll(targetId, expression, options = {}) {
-  requireArg(targetId, 'missing targetId');
-  requireArg(expression, 'missing expression');
-
-  const timeout = ensurePositiveNumber(options.timeout, 10000);
-  const interval = ensurePositiveNumber(options.interval, 200);
-
-  const start = Date.now();
-  let result;
-
-  while (Date.now() - start < timeout) {
-    // {ok: true, value: true|false|text|'',} 
-    // {ok: false, error,}
-    // success: ok=true, value=true|text
-    // failed: ok=true, value=false|''
-    // failed: ok=false, error
-    result = await evaluate(targetId, expression);
-
-    if (result.ok === true && isPollMatched(result.value)) {
-      return result;
-    }
-
-    await sleep(interval);
-  }
-
-  return failResult(result.error ?? result.value, result);
-}
 
 /**
  * 等 selector 对应元素出现。
