@@ -1,33 +1,22 @@
 import { getClient } from './client.js';
-import { requireArg, requireEmitter } from './assert.js';
-import { okResult, failResult, evaluate } from './runtime.js';
-import { ensurePositiveNumber, sleep } from '../infra/core.js';
+import { poll } from './executor.js';
+import { ok, fail } from '../infra/protocol.js';
+import { ensurePositiveNumber } from '../infra/core.js';
+import { parseNonBlank, checkString } from '../infra/validate.js';
 
 /**
- * 等待相关能力。
- *
- * 这一层负责统一封装：
- * - 轮询等待
- * - 页面事件等待
- * - 元素与文本状态等待
- *
- * 对外提供：
- * - 等元素出现、可见、可点击
- * - 等文本满足条件
- * - 等 JS 条件成立
- * - 等导航、DOMContentLoaded、load
+ * 等待相关能力（统一基于 poll / 事件）
  */
 
 
 
 
-
 /**
- * 等 selector 对应元素出现。
+ * 等 selector 出现
  */
 export function waitSelector(targetId, selector, options = {}) {
-  requireArg(targetId, 'missing targetId');
-  requireArg(selector, 'missing selector');
+  targetId = assert(parseNonBlank(targetId), () => argMissingError('targetId'));
+  selector = assert(parseNonBlank(selector), () => argMissingError('selector'));
 
   const expression = `
     (() => {
@@ -39,12 +28,13 @@ export function waitSelector(targetId, selector, options = {}) {
   return poll(targetId, expression, options);
 }
 
+
 /**
  * 等元素可见。
  */
 export function waitVisible(targetId, selector, options = {}) {
-  requireArg(targetId, 'missing targetId');
-  requireArg(selector, 'missing selector');
+  targetId = assert(parseNonBlank(targetId), () => argMissingError('targetId'));
+  selector = assert(parseNonBlank(selector), () => argMissingError('selector'));
 
   const expression = `
     (() => {
@@ -71,8 +61,8 @@ export function waitVisible(targetId, selector, options = {}) {
  * 等元素可点击。
  */
 export function waitClickable(targetId, selector, options = {}) {
-  requireArg(targetId, 'missing targetId');
-  requireArg(selector, 'missing selector');
+  targetId = assert(parseNonBlank(targetId), () => argMissingError('targetId'));
+  selector = assert(parseNonBlank(selector), () => argMissingError('selector'));
 
   const expression = `
     (() => {
@@ -105,11 +95,11 @@ export function waitClickable(targetId, selector, options = {}) {
  * 等元素文本满足条件。
  */
 function waitTextByMode(targetId, selector, expectedText, mode, options = {}) {
-  requireArg(targetId, 'missing targetId');
-  requireArg(selector, 'missing selector');
-  requireArg(expectedText, 'missing expectedText');
+  targetId = assert(parseNonBlank(targetId), () => argMissingError('targetId'));
+  selector = assert(parseNonBlank(selector), () => argMissingError('selector'));
+  expectedText = assert(expectedText, () => argMissingError('expectedText'));
+  expectedText = assert(checkString(expectedText), () => argInvalidError('expectedText'));
 
-  const expected = String(expectedText);
 
   const expression = `
     (() => {

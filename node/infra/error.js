@@ -1,66 +1,145 @@
-export const ERROR_CODE = {
-  // ========================
-  // 参数错误（CLI 输入层）
-  // ========================
-  ARG_MISSING: "ARG_MISSING", // 缺少必要参数（undefined / null / 未传）
-  ARG_EMPTY: "ARG_EMPTY", // 参数为空（'' / 空字符串 / 全空格）
-  ARG_INVALID: "ARG_INVALID", // 参数格式或类型不合法
+export const ERROR = {
+  // existence
+  REQUIRED: 'REQUIRED',
 
-  // ========================
-  // 命令错误（CLI 命令层）
-  // ========================
-  CMD_MISSING: "CMD_MISSING", // 未提供命令
-  CMD_INVALID: "CMD_INVALID", // 命令不存在或不支持
+  // type
+  NOT_STRING: 'NOT_STRING',
+  NOT_NUMBER: 'NOT_NUMBER',
+  NOT_BOOLEAN: 'NOT_BOOLEAN',
+  NOT_ARRAY: 'NOT_ARRAY',
+  NOT_OBJECT: 'NOT_OBJECT',
+  NOT_FUNCTION: 'NOT_FUNCTION',
 
-  // ========================
-  // 目标错误（浏览器对象层）
-  // ========================
-  TARGET_MISSING: "TARGET_MISSING", // 缺少 targetId
-  TARGET_NOT_FOUND: "TARGET_NOT_FOUND", // 未找到对应的 target（页面 / tab）
+  // string
+  BLANK_VALUE: 'BLANK_VALUE',     // '' / null / undefined / '   '
+  TOO_SHORT: 'TOO_SHORT',
+  TOO_LONG: 'TOO_LONG',
+  INVALID_PATTERN: 'INVALID_PATTERN',
 
-  // ========================
-  // 运行时错误（CDP / evaluate）
-  // ========================
-  RUNTIME_EVAL_EXCEPTION: "RUNTIME_EVAL_EXCEPTION", // 执行表达式抛错
-  RUNTIME_EVAL_NO_MATCH: "RUNTIME_EVAL_NO_MATCH", // 执行表达式条件不成立
+  // number
+  NOT_A_NUMBER: 'NOT_A_NUMBER',
+  NOT_INTEGER: 'NOT_INTEGER',
+  NOT_POSITIVE: 'NOT_POSITIVE',
+  NOT_NEGATIVE: 'NOT_NEGATIVE',
+  OUT_OF_RANGE: 'OUT_OF_RANGE',
 
-  // ========================
-  // 系统错误（兜底）
-  // ========================
-  INTERNAL_ERROR: "INTERNAL_ERROR", // 未分类的内部错误
+  // collection
+  NOT_IN_ENUM: 'NOT_IN_ENUM',
+  NOT_UNIQUE: 'NOT_UNIQUE',
+
+  // format
+  INVALID_EMAIL: 'INVALID_EMAIL',
+  INVALID_URL: 'INVALID_URL',
+  INVALID_DATE: 'INVALID_DATE',
+
+  // fallback
+  INVALID: 'INVALID',
+  INTERNAL: 'INTERNAL',
 };
 
-export const EXIT_CODE_MAP = {
-  // 参数错误
-  ARG_MISSING: 2,
-  ARG_EMPTY: 2,
-  ARG_INVALID: 2,
+export const ERROR_SCHEMA = {
+  // existence
+  REQUIRED: {
+    code: ERROR.REQUIRED,
+    message: '{field} is required',
+  },
 
-  // 命令错误
-  CMD_MISSING: 3,
-  CMD_INVALID: 3,
+  // type
+  NOT_STRING: {
+    code: ERROR.NOT_STRING,
+    message: '{field} must be a string',
+  },
+  NOT_NUMBER: {
+    code: ERROR.NOT_NUMBER,
+    message: '{field} must be a number',
+  },
+  NOT_BOOLEAN: {
+    code: ERROR.NOT_BOOLEAN,
+    message: '{field} must be a boolean',
+  },
+  NOT_ARRAY: {
+    code: ERROR.NOT_ARRAY,
+    message: '{field} must be an array',
+  },
+  NOT_OBJECT: {
+    code: ERROR.NOT_OBJECT,
+    message: '{field} must be an object',
+  },
+  NOT_FUNCTION: {
+    code: ERROR.NOT_FUNCTION,
+    message: '{field} must be a function',
+  },
 
-  // target 错误
-  TARGET_MISSING: 4,
-  TARGET_NOT_FOUND: 4,
+  // string
+  BLANK_VALUE: {
+    code: ERROR.BLANK_VALUE,
+    message: '{field} must not be blank',
+  },
+  TOO_SHORT: {
+    code: ERROR.TOO_SHORT,
+    message: '{field} is too short (min: {min})',
+  },
+  TOO_LONG: {
+    code: ERROR.TOO_LONG,
+    message: '{field} is too long (max: {max})',
+  },
+  INVALID_PATTERN: {
+    code: ERROR.INVALID_PATTERN,
+    message: '{field} format is invalid',
+  },
 
-  // runtime 错误
-  RUNTIME_EVAL_ERROR: 5,
-  RUNTIME_EVAL_FAILED: 5,
+  // number
+  NOT_A_NUMBER: {
+    code: ERROR.NOT_A_NUMBER,
+    message: '{field} must be a valid number',
+  },
+  NOT_INTEGER: {
+    code: ERROR.NOT_INTEGER,
+    message: '{field} must be an integer',
+  },
+  NOT_POSITIVE: {
+    code: ERROR.NOT_POSITIVE,
+    message: '{field} must be positive',
+  },
+  OUT_OF_RANGE: {
+    code: ERROR.OUT_OF_RANGE,
+    message: '{field} must be between {min} and {max}',
+  },
 
-  // 默认
-  INTERNAL_ERROR: 1,
+  // collection
+  NOT_IN_ENUM: {
+    code: ERROR.NOT_IN_ENUM,
+    message: '{field} must be one of [{values}]',
+  },
+  NOT_UNIQUE: {
+    code: ERROR.NOT_UNIQUE,
+    message: '{field} must be unique',
+  },
+
+  // format
+  INVALID_EMAIL: {
+    code: ERROR.INVALID_EMAIL,
+    message: '{field} must be a valid email',
+  },
+  INVALID_URL: {
+    code: ERROR.INVALID_URL,
+    message: '{field} must be a valid URL',
+  },
+  INVALID_DATE: {
+    code: ERROR.INVALID_DATE,
+    message: '{field} must be a valid date',
+  },
+
+  // fallback
+  INVALID: {
+    code: ERROR.INVALID,
+    message: '{field} is invalid',
+  },
+  INTERNAL: {
+    code: ERROR.INTERNAL,
+    message: 'internal error',
+  },
 };
-
-export function resolveExitCode(error) {
-  if (!error || typeof error !== "object") {
-    return 1;
-  }
-
-  const code = error.code;
-  return EXIT_CODE_MAP[code] ?? 1;
-}
-
 export class ClientError extends Error {
   constructor(code, message, details = null) {
     super(message);
@@ -70,7 +149,7 @@ export class ClientError extends Error {
     // new.target 被哪个构造函数 new 出来的，new ClientError(...) 就是 ClientError
     Object.setPrototypeOf(this, new.target.prototype);
     this.name = "ClientError";
-    this.code = code || ERROR_CODE.INTERNAL_ERROR;
+    this.code = code || ERROR.INTERNAL;
     this.details = details;
   }
 }
@@ -81,7 +160,7 @@ export function normalizeError(err, options = {}) {
   // 已经是我们自己的错误
   if (err instanceof ClientError) {
     return {
-      code: err.code || ERROR_CODE.INTERNAL_ERROR,
+      code: err.code || ERROR.INTERNAL,
       message: err.message || "unknown error",
       details: err.details ?? null,
       ...(includeStack && { stack: err.stack }),
@@ -96,7 +175,7 @@ export function normalizeError(err, options = {}) {
         : JSON.stringify(err);
 
     return {
-      code: err.code || ERROR_CODE.INTERNAL_ERROR,
+      code: err.code || ERROR.INTERNAL,
       message: message || "unknown error",
       details: err.details ?? err,
     };
@@ -104,33 +183,109 @@ export function normalizeError(err, options = {}) {
 
   // 字符串 / 其他
   return {
-    code: ERROR_CODE.INTERNAL_ERROR,
+    code: ERROR.INTERNAL,
     message: String(err ?? "unknown error"),
     details: null,
   };
 }
 
-export const argMissingError = (field) =>
-  new ClientError(ERROR_CODE.ARG_MISSING, `missing ${field}`);
+function format(template, params = {}) {
+  return template.replace(/\{(\w+)\}/g, (_, key) => {
+    return params[key] ?? `{${key}}`;
+  });
+}
 
-export const argEmptyError = (field) =>
-  new ClientError(ERROR_CODE.ARG_EMPTY, `empty ${field}`);
+export function createClientError(errorKey, params = {}, details = null) {
+  const def = ERROR_SCHEMA[errorKey] || ERROR_SCHEMA.INTERNAL;
 
-export const argInvalidError = (field) =>
-  new ClientError(ERROR_CODE.ARG_INVALID, `invalid ${field}`, { field });
-
-export const cmdMissingError = (cmd) =>
-  new ClientError(ERROR_CODE.CMD_MISSING, `missing command: ${cmd}`);
-
-export const cmdInvalidError = (cmd) =>
-  new ClientError(ERROR_CODE.CMD_INVALID, `invalid command: ${cmd}`, { cmd });
-
-export const targetMissingError = () =>
-  new ClientError(ERROR_CODE.TARGET_MISSING, "missing targetId");
-
-export const targetNotFoundError = (targetId) =>
-  new ClientError(
-    ERROR_CODE.TARGET_NOT_FOUND,
-    `target not found: ${targetId}`,
-    { targetId },
+  return new ClientError(
+    def.code,
+    format(def.message, params),
+    details
   );
+}
+
+export const errors = {
+  // existence
+  required: (field, details) =>
+    createClientError(ERROR.REQUIRED, { field }, details),
+
+  // type
+  notString: (field, details) =>
+    createClientError(ERROR.NOT_STRING, { field }, details),
+
+  notNumber: (field, details) =>
+    createClientError(ERROR.NOT_NUMBER, { field }, details),
+
+  notBoolean: (field, details) =>
+    createClientError(ERROR.NOT_BOOLEAN, { field }, details),
+
+  notArray: (field, details) =>
+    createClientError(ERROR.NOT_ARRAY, { field }, details),
+
+  notObject: (field, details) =>
+    createClientError(ERROR.NOT_OBJECT, { field }, details),
+
+  notFunction: (field, details) =>
+    createClientError(ERROR.NOT_FUNCTION, { field }, details),
+
+  // string
+  blankValue: (field, details) =>
+    createClientError(ERROR.BLANK_VALUE, { field }, details),
+
+  tooShort: (field, min, details) =>
+    createClientError(ERROR.TOO_SHORT, { field, min }, details),
+
+  tooLong: (field, max, details) =>
+    createClientError(ERROR.TOO_LONG, { field, max }, details),
+
+  invalidPattern: (field, details) =>
+    createClientError(ERROR.INVALID_PATTERN, { field }, details),
+
+  // number
+  notANumber: (field, details) =>
+    createClientError(ERROR.NOT_A_NUMBER, { field }, details),
+
+  notInteger: (field, details) =>
+    createClientError(ERROR.NOT_INTEGER, { field }, details),
+
+  notPositive: (field, details) =>
+    createClientError(ERROR.NOT_POSITIVE, { field }, details),
+
+  notNegative: (field, details) =>
+    createClientError(ERROR.NOT_NEGATIVE, { field }, details),
+
+  outOfRange: (field, { min, max } = {}, details) =>
+    createClientError(ERROR.OUT_OF_RANGE, { field, min, max }, details),
+
+  // collection
+  notInEnum: (field, values, details) =>
+    createClientError(
+      ERROR.NOT_IN_ENUM,
+      {
+        field,
+        values: Array.isArray(values) ? values.join(', ') : values,
+      },
+      details
+    ),
+
+  notUnique: (field, details) =>
+    createClientError(ERROR.NOT_UNIQUE, { field }, details),
+
+  // format
+  invalidEmail: (field, details) =>
+    createClientError(ERROR.INVALID_EMAIL, { field }, details),
+
+  invalidUrl: (field, details) =>
+    createClientError(ERROR.INVALID_URL, { field }, details),
+
+  invalidDate: (field, details) =>
+    createClientError(ERROR.INVALID_DATE, { field }, details),
+
+  // fallback
+  invalid: (field, details) =>
+    createClientError(ERROR.INVALID, { field }, details),
+
+  internal: (details) =>
+    createClientError(ERROR.INTERNAL, {}, details),
+};
